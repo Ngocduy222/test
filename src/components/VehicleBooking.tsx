@@ -140,6 +140,16 @@ bookedBy: "Lê Văn C (40%)",
   const currentUserOwnership = 35; // Mock current user ownership percentage
   const currentUserName = "Bạn"; // Mock current user display name for matching
 
+  // Build LocalDateTime string required by BE (YYYY-MM-DDTHH:mm:SS)
+  const toLocalDateTime = (date: string, hhmm: string) => {
+    const [hh, mm] = hhmm.split(":");
+    return `${date}T${hh}:${mm}:00`;
+  };
+  const getSelectedVehicleName = (): string => {
+    const v = vehicles.find(v => String(v.id) === String(selectedVehicle));
+    return v?.name || "";
+  };
+
   const getOwnershipColor = (ownership: number) => {
     if (ownership >= 50) return "default";
     if (ownership >= 30) return "secondary";
@@ -198,7 +208,7 @@ bookedBy: "Lê Văn C (40%)",
     const timeRange = `${selectedStartTime}-${selectedEndTime}`;
     // Prevent selecting an overlapping range for current vehicle/date
     const hasOverlap = existingBookings.some(booking => 
-      booking.vehicle === selectedVehicle &&
+      booking.vehicle === getSelectedVehicleName() &&
       booking.date === selectedDate &&
       rangesOverlap(booking.time, timeRange)
     );
@@ -219,7 +229,7 @@ bookedBy: "Lê Văn C (40%)",
     });
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!selectedVehicle || !selectedDate || !selectedTime) {
       toast({
         title: "Thiếu thông tin",
@@ -244,7 +254,7 @@ const prospectiveDaysCount = alreadyCounted ? daysSet.size : daysSet.size + 1;
 
     // Kiểm tra chồng lấn thời gian cho cùng xe và ngày
     const hasConflict = existingBookings.some(booking => 
-      booking.vehicle === selectedVehicle && 
+      booking.vehicle === getSelectedVehicleName() && 
       booking.date === selectedDate && 
       rangesOverlap(booking.time, selectedTime)
     );
@@ -266,7 +276,7 @@ const prospectiveDaysCount = alreadyCounted ? daysSet.size : daysSet.size + 1;
       id: newBookingId,
       time: selectedTime,
       date: selectedDate,
-      vehicle: selectedVehicle,
+      vehicle: getSelectedVehicleName(),
       bookedBy: `${currentUserName} (${currentUserOwnership}%)`,
       ownershipLevel: currentUserOwnership,
       canOverride: false
@@ -297,12 +307,55 @@ const prospectiveDaysCount = alreadyCounted ? daysSet.size : daysSet.size + 1;
       setNewlyCreatedBooking(null);
     }, 3000);
     
-    console.log("Booking:", { selectedVehicle, selectedDate, selectedTime });
-    // Here would integrate with backend to create booking
+    console.log("Booking:", { selectedVehicleId: selectedVehicle, selectedVehicleName: getSelectedVehicleName(), selectedDate, selectedTime });
+    // Gửi lên BE (Spring) nếu có đủ thông tin ID
+    try {
+      // Lấy vehicleId từ danh sách vehicles theo id đã chọn
+      const vehicle = vehicles.find(v => String(v.id) === String(selectedVehicle));
+      const vehicleIdRaw = vehicle?.id;
+
+      // Thử lấy userId, groupId từ localStorage (tùy hệ thống auth của bạn)
+      const userIdRaw = localStorage.getItem("currentUserId");
+      const groupIdRaw = localStorage.getItem("currentGroupId");
+
+      if (!vehicleIdRaw || !userIdRaw || !groupIdRaw) {
+        console.warn("Thiếu ID để gọi BE:", { vehicleIdRaw, userIdRaw, groupIdRaw });
+        toast({
+          title: "Thiếu thông tin định danh",
+          description: "Không xác định được user/group/vehicle ID để gửi về máy chủ.",
+          variant: "destructive",
+        });
+      } else {
+        const [start, end] = selectedTime.split("-");
+        const payload = {
+          startTime: toLocalDateTime(selectedDate, start),
+          endTime: toLocalDateTime(selectedDate, end),
+          status: "pending",
+          groupId: Number(groupIdRaw),
+          userId: Number(userIdRaw),
+          vehicleId: Number(vehicleIdRaw),
+        };
+
+        const beBaseUrl = (import.meta as any)?.env?.VITE_BE_BASE_URL || "http://localhost:8080";
+        const res = await fetch(`${beBaseUrl}/Schedule/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          const errText = await res.text().catch(() => "");
+          throw new Error(`HTTP ${res.status} ${errText}`);
+        }
+        console.log("[VehicleBooking] BE create schedule OK");
+      }
+    } catch (err) {
+      console.error("[VehicleBooking] Lỗi gọi BE /Schedule/register:", err);
+      // Tiếp tục hiển thị thành công local để UX không bị chặn; BE có thể đồng bộ sau
+    }
     
     toast({
       title: "Đặt lịch thành công",
-      description: `Đã đặt ${selectedVehicle} vào ${selectedDate} từ ${selectedTime}. Mục mới nằm ở đầu danh sách.`,
+      description: `Đã đặt ${getSelectedVehicleName()} vào ${selectedDate} từ ${selectedTime}. Mục mới nằm ở đầu danh sách.`,
     });
   };
 
