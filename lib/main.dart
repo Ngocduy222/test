@@ -165,6 +165,10 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
     );
   }
 
+  void openPage(Widget page) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,7 +176,12 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
         child: IndexedStack(
           index: currentIndex,
           children: [
-            HomeScreen(onAdd: openAddTransaction),
+            HomeScreen(
+              onAdd: openAddTransaction,
+              onBudget: () => openPage(const BudgetManagerScreen()),
+              onAnalysis: () => openPage(const AnalysisScreen()),
+              onSaving: () => setState(() => currentIndex = 2),
+            ),
             TransactionsScreen(items: transactions),
             const GoalsScreen(),
             const ProfileScreen(),
@@ -312,8 +321,17 @@ class BubbleIcon extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.onAdd});
+  const HomeScreen({
+    super.key,
+    required this.onAdd,
+    required this.onBudget,
+    required this.onAnalysis,
+    required this.onSaving,
+  });
   final VoidCallback onAdd;
+  final VoidCallback onBudget;
+  final VoidCallback onAnalysis;
+  final VoidCallback onSaving;
 
   @override
   Widget build(BuildContext context) {
@@ -398,6 +416,86 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF2F0FF),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: const Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BubbleIcon(
+                Icons.lightbulb_outline_rounded,
+                AppColors.green,
+                size: 40,
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Góc nhỏ thông thái  ·  Đúng lộ trình',
+                      style: TextStyle(
+                        color: AppColors.green,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Giữ mức ăn uống dưới 80.000₫/ngày sẽ giúp bạn cán đích quỹ mua Laptop sớm hơn 1 tuần đấy!',
+                      style: TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 12,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SectionTitle('Thao tác nhanh'),
+        Row(
+          children: [
+            Expanded(
+              child: QuickAction(
+                icon: Icons.add_circle_outline,
+                label: 'Ghi chi tiêu',
+                active: true,
+                onTap: onAdd,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: QuickAction(
+                icon: Icons.tune_rounded,
+                label: 'Đặt ngân sách',
+                onTap: onBudget,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: QuickAction(
+                icon: Icons.query_stats_rounded,
+                label: 'Phân tích',
+                onTap: onAnalysis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: QuickAction(
+                icon: Icons.savings_outlined,
+                label: 'Hũ tiết kiệm',
+                onTap: onSaving,
+              ),
+            ),
+          ],
+        ),
         const SectionTitle('Hạng mục tháng này', action: 'Xem tất cả'),
         SizedBox(
           height: 34,
@@ -474,6 +572,338 @@ class HeroStat extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class QuickAction extends StatelessWidget {
+  const QuickAction({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.active = false,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        height: 76,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: active ? AppColors.purple : const Color(0xFFEDEBFF),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: active ? Colors.white : AppColors.purple),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: active ? Colors.white : AppColors.ink,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PageScaffold extends StatelessWidget {
+  const PageScaffold({
+    super.key,
+    required this.title,
+    required this.child,
+    this.action,
+  });
+  final String title;
+  final Widget child;
+  final Widget? action;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.ink,
+            fontSize: 18,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        centerTitle: false,
+        backgroundColor: AppColors.background,
+        surfaceTintColor: Colors.transparent,
+        actions: action == null ? null : [action!],
+      ),
+      body: child,
+    );
+  }
+}
+
+class BudgetManagerScreen extends StatefulWidget {
+  const BudgetManagerScreen({super.key});
+
+  @override
+  State<BudgetManagerScreen> createState() => _BudgetManagerScreenState();
+}
+
+class _BudgetManagerScreenState extends State<BudgetManagerScreen> {
+  late final List<double> limits = budgetData
+      .map((item) => item.limit.toDouble())
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return PageScaffold(
+      title: 'Đặt ngân sách',
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppColors.purple,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'NGÂN SÁCH THÁNG 10',
+                  style: TextStyle(color: Color(0xFFD8CEFF), fontSize: 10),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  '8.000.000₫',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                Text(
+                  'Kéo thanh để thay đổi hạn mức từng danh mục',
+                  style: TextStyle(color: Color(0xFFD8CEFF), fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          ...budgetData.asMap().entries.map((entry) {
+            final item = entry.value;
+            final i = entry.key;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      BubbleIcon(item.icon, item.color),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Text(
+                              'Hạn mức ${money(limits[i])}',
+                              style: const TextStyle(
+                                color: AppColors.muted,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        '${(item.spent / limits[i] * 100).round()}%',
+                        style: TextStyle(
+                          color: item.color,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: limits[i],
+                    min: 300000,
+                    max: 3000000,
+                    divisions: 27,
+                    activeColor: item.color,
+                    onChanged: (value) => setState(() => limits[i] = value),
+                  ),
+                ],
+              ),
+            );
+          }),
+          FilledButton.icon(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã lưu ngân sách tháng này')),
+              );
+            },
+            icon: const Icon(Icons.check_rounded),
+            label: const Text('Lưu ngân sách'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.purple,
+              padding: const EdgeInsets.all(16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AnalysisScreen extends StatelessWidget {
+  const AnalysisScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final values = [55.0, 82.0, 42.0, 95.0, 68.0, 76.0, 48.0];
+    return PageScaffold(
+      title: 'Phân tích chi tiêu',
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        children: [
+          const Row(
+            children: [
+              Expanded(
+                child: SummaryCard(
+                  'Tổng thu',
+                  '+8.000.000₫',
+                  AppColors.green,
+                  Color(0xFFE9F9F2),
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: SummaryCard(
+                  'Tổng chi',
+                  '-4.550.000₫',
+                  AppColors.red,
+                  Color(0xFFFFF0F2),
+                ),
+              ),
+            ],
+          ),
+          const SectionTitle('Chi tiêu 7 ngày gần đây'),
+          Container(
+            height: 220,
+            padding: const EdgeInsets.fromLTRB(16, 22, 16, 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: values.asMap().entries.map((entry) {
+                const labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+                return Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: 20,
+                        height: entry.value * 1.5,
+                        decoration: BoxDecoration(
+                          color: entry.key == 3
+                              ? AppColors.purple
+                              : const Color(0xFFCEC5F8),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        labels[entry.key],
+                        style: const TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SectionTitle('Chi theo danh mục'),
+          ...budgetData.map((item) {
+            final share = item.spent / 4550000;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: Row(
+                children: [
+                  BubbleIcon(item.icon, item.color, size: 40),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Text(
+                              money(item.spent),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: LinearProgressIndicator(
+                            value: share,
+                            minHeight: 6,
+                            color: item.color,
+                            backgroundColor: AppColors.line,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 }
