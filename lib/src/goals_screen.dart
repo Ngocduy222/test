@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Theo dõi tiến độ các mục tiêu tiết kiệm của người dùng.
 class GoalsScreen extends StatelessWidget {
   const GoalsScreen({super.key});
 

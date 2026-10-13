@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Dashboard tổng hợp ngân sách và các thao tác nhanh.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -8,10 +9,10 @@ class HomeScreen extends StatelessWidget {
     required this.onAnalysis,
     required this.onSaving,
   });
-  final VoidCallback onAdd;
-  final VoidCallback onBudget;
-  final VoidCallback onAnalysis;
-  final VoidCallback onSaving;
+  final VoidCallback onAdd; // Mở form ghi chi tiêu.
+  final VoidCallback onBudget; // Mở màn quản lý ngân sách.
+  final VoidCallback onAnalysis; // Mở màn phân tích chi tiêu.
+  final VoidCallback onSaving; // Chuyển sang tab mục tiêu tiết kiệm.
 
   @override
   Widget build(BuildContext context) {

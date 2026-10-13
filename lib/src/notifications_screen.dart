@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Trung tâm cảnh báo ngân sách, giao dịch và gợi ý tài chính.
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -8,6 +9,7 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
+  /// Bộ lọc đang chọn: tất cả, cảnh báo ngân sách hoặc thông báo cá nhân.
   int filter = 0;
 
   @override

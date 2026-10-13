@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Hiển thị và tìm kiếm toàn bộ lịch sử giao dịch.
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({
     super.key,
@@ -14,6 +15,7 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
+  /// Từ khóa tìm kiếm theo tên hoặc danh mục giao dịch.
   String query = '';
 
   @override
@@ -121,6 +123,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 }
 
+/// Hiển thị đầy đủ thông tin, chỉnh sửa và xóa một giao dịch.
 class TransactionDetailScreen extends StatelessWidget {
   const TransactionDetailScreen({
     super.key,
@@ -131,6 +134,7 @@ class TransactionDetailScreen extends StatelessWidget {
   final TransactionData transaction;
   final VoidCallback onDelete;
 
+  /// Hiện hộp thoại xác nhận trước khi xóa vĩnh viễn giao dịch.
   Future<void> confirmDelete(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,

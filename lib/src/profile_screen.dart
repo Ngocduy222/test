@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Hồ sơ người dùng, tài khoản ví, tiện ích sinh viên và cài đặt.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 

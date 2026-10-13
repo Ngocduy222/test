@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Cho phép xem và điều chỉnh hạn mức của từng nhóm ngân sách.
 class BudgetManagerScreen extends StatefulWidget {
   const BudgetManagerScreen({super.key});
 
@@ -8,6 +9,7 @@ class BudgetManagerScreen extends StatefulWidget {
 }
 
 class _BudgetManagerScreenState extends State<BudgetManagerScreen> {
+  /// Danh sách hạn mức có thể thay đổi bằng thanh Slider.
   late final List<double> limits = budgetData
       .map((item) => item.limit.toDouble())
       .toList();
@@ -125,6 +127,7 @@ class _BudgetManagerScreenState extends State<BudgetManagerScreen> {
   }
 }
 
+/// Tổng hợp thu/chi, biểu đồ theo ngày và tỷ trọng từng danh mục.
 class AnalysisScreen extends StatelessWidget {
   const AnalysisScreen({super.key});
 

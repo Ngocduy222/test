@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Form nhập khoản thu/chi mới từ nút dấu cộng.
 class AddTransactionSheet extends StatefulWidget {
   const AddTransactionSheet({super.key, required this.onSave});
   final ValueChanged<TransactionData> onSave;
@@ -9,6 +10,7 @@ class AddTransactionSheet extends StatefulWidget {
 }
 
 class _AddTransactionSheetState extends State<AddTransactionSheet> {
+  /// true là khoản chi, false là khoản thu.
   bool isExpense = true;
   final amountController = TextEditingController();
   final noteController = TextEditingController();
@@ -20,6 +22,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     super.dispose();
   }
 
+  /// Kiểm tra dữ liệu, tạo giao dịch mới và trả về màn hình cha.
   void save() {
     final value = int.tryParse(
       amountController.text.replaceAll(RegExp('[^0-9]'), ''),
@@ -176,6 +179,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     );
   }
 
+  /// Nút chuyển đổi giữa khoản chi và khoản thu.
   Widget segment(String text, bool value) {
     return Expanded(
       child: InkWell(
@@ -199,6 +203,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     );
   }
 
+  /// Tiêu đề nhỏ dùng chung cho các trường nhập liệu.
   Widget inputLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 17, bottom: 7),

@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Bảng màu dùng thống nhất trong toàn bộ ứng dụng.
 class AppColors {
   static const purple = Color(0xFF5B2DDE);
   static const darkPurple = Color(0xFF3D1CA8);
@@ -12,6 +13,7 @@ class AppColors {
   static const background = Color(0xFFF8F7FC);
 }
 
+/// Định dạng số thành tiền Việt Nam, ví dụ: 4550000 → 4.550.000₫.
 String money(num value) {
   final text = value.abs().round().toString();
   final output = StringBuffer();
@@ -22,6 +24,7 @@ String money(num value) {
   return '$output₫';
 }
 
+/// Model lưu thông tin của một giao dịch thu hoặc chi.
 class TransactionData {
   const TransactionData(
     this.name,
@@ -39,6 +42,7 @@ class TransactionData {
   final String date;
 }
 
+/// Model lưu hạn mức và số tiền đã dùng của một nhóm ngân sách.
 class BudgetData {
   const BudgetData(this.name, this.spent, this.limit, this.icon, this.color);
   final String name;
@@ -48,6 +52,7 @@ class BudgetData {
   final Color color;
 }
 
+/// Dữ liệu ngân sách mẫu theo thiết kế Figma.
 const budgetData = [
   BudgetData(
     'Ăn uống & Cà phê',

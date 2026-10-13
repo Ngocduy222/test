@@ -10,8 +10,10 @@ part 'src/notifications_screen.dart';
 part 'src/profile_screen.dart';
 part 'src/add_transaction_sheet.dart';
 
+/// Điểm khởi chạy của ứng dụng MoneyMate.
 void main() => runApp(const MyApp());
 
+/// Cấu hình MaterialApp, giao diện chung và màn hình đầu tiên.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Khung điều hướng chính chứa bốn tab và nút thêm giao dịch.
 class MoneyMateShell extends StatefulWidget {
   const MoneyMateShell({super.key});
 
@@ -38,7 +41,10 @@ class MoneyMateShell extends StatefulWidget {
 }
 
 class _MoneyMateShellState extends State<MoneyMateShell> {
+  /// Tab đang được chọn: 0-Trang chủ, 1-Giao dịch, 2-Mục tiêu, 3-Cá nhân.
   int currentIndex = 0;
+
+  /// Dữ liệu giao dịch local dùng chung cho danh sách và màn chi tiết.
   final transactions = <TransactionData>[
     const TransactionData(
       'Highlands Coffee',
@@ -82,6 +88,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
     ),
   ];
 
+  /// Mở form thêm khoản thu/chi dưới dạng bottom sheet.
   void openAddTransaction() {
     showModalBottomSheet<void>(
       context: context,
@@ -96,6 +103,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
     );
   }
 
+  /// Điều hướng tới một màn chức năng phụ.
   void openPage(Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
@@ -153,6 +161,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
     );
   }
 
+  /// Tạo một mục trong thanh điều hướng dưới cùng.
   Widget navItem(int index, IconData icon, String label) {
     final active = currentIndex == index;
     return Expanded(

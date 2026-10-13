@@ -1,5 +1,6 @@
 part of '../main.dart';
 
+/// Header dùng chung gồm logo, chuông thông báo, avatar và tiêu đề trang.
 class ScreenHeader extends StatelessWidget {
   const ScreenHeader(this.title, {super.key, this.label});
   final String title;
@@ -124,6 +125,7 @@ class ScreenHeader extends StatelessWidget {
   }
 }
 
+/// Icon tròn có màu nền nhạt, dùng cho danh mục và danh sách.
 class BubbleIcon extends StatelessWidget {
   const BubbleIcon(this.icon, this.color, {super.key, this.size = 44});
   final IconData icon;
@@ -144,6 +146,7 @@ class BubbleIcon extends StatelessWidget {
   }
 }
 
+/// Hiển thị một chỉ số nhỏ trong thẻ tổng quan ngân sách.
 class HeroStat extends StatelessWidget {
   const HeroStat(this.label, this.value, {super.key});
   final String label;
@@ -171,6 +174,7 @@ class HeroStat extends StatelessWidget {
   }
 }
 
+/// Nút thao tác nhanh trên dashboard.
 class QuickAction extends StatelessWidget {
   const QuickAction({
     super.key,
@@ -217,6 +221,7 @@ class QuickAction extends StatelessWidget {
   }
 }
 
+/// Khung trang phụ có AppBar và nội dung dùng chung.
 class PageScaffold extends StatelessWidget {
   const PageScaffold({
     super.key,
@@ -250,6 +255,7 @@ class PageScaffold extends StatelessWidget {
   }
 }
 
+/// Tiêu đề phân khu, có thể kèm hành động ở bên phải.
 class SectionTitle extends StatelessWidget {
   const SectionTitle(this.title, {super.key, this.action});
   final String title;
@@ -285,6 +291,7 @@ class SectionTitle extends StatelessWidget {
   }
 }
 
+/// Thẻ thể hiện hạn mức, số đã chi và tiến độ một danh mục.
 class BudgetCard extends StatelessWidget {
   const BudgetCard(this.item, {super.key});
   final BudgetData item;
@@ -369,6 +376,7 @@ class BudgetCard extends StatelessWidget {
   }
 }
 
+/// Thẻ tóm tắt tổng thu hoặc tổng chi.
 class SummaryCard extends StatelessWidget {
   const SummaryCard(
     this.label,
@@ -412,6 +420,7 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
+/// Một dòng thông tin nhãn–giá trị trong màn chi tiết giao dịch.
 class DetailRow extends StatelessWidget {
   const DetailRow({
     super.key,
@@ -452,6 +461,7 @@ class DetailRow extends StatelessWidget {
   );
 }
 
+/// Dòng cài đặt có công tắc bật/tắt.
 class SettingsSwitch extends StatefulWidget {
   const SettingsSwitch({
     super.key,
@@ -491,6 +501,7 @@ class _SettingsSwitchState extends State<SettingsSwitch> {
   );
 }
 
+/// Dòng hiển thị tên ví và số dư hiện tại.
 class WalletTile extends StatelessWidget {
   const WalletTile({
     super.key,
