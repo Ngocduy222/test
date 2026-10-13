@@ -189,7 +189,11 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
               onAnalysis: () => openPage(const AnalysisScreen()),
               onSaving: () => setState(() => currentIndex = 2),
             ),
-            TransactionsScreen(items: transactions),
+            TransactionsScreen(
+              items: transactions,
+              onDelete: (transaction) =>
+                  setState(() => transactions.remove(transaction)),
+            ),
             const GoalsScreen(),
             const ProfileScreen(),
           ],
@@ -1105,8 +1109,13 @@ class BudgetCard extends StatelessWidget {
 }
 
 class TransactionsScreen extends StatefulWidget {
-  const TransactionsScreen({super.key, required this.items});
+  const TransactionsScreen({
+    super.key,
+    required this.items,
+    required this.onDelete,
+  });
   final List<TransactionData> items;
+  final ValueChanged<TransactionData> onDelete;
 
   @override
   State<TransactionsScreen> createState() => _TransactionsScreenState();
@@ -1174,6 +1183,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               itemBuilder: (_, index) {
                 final item = items[index];
                 return ListTile(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => TransactionDetailScreen(
+                        transaction: item,
+                        onDelete: () {
+                          widget.onDelete(item);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  ),
                   contentPadding: const EdgeInsets.symmetric(vertical: 5),
                   leading: BubbleIcon(item.icon, item.color, size: 46),
                   title: Text(
@@ -1250,6 +1270,244 @@ class SummaryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class TransactionDetailScreen extends StatelessWidget {
+  const TransactionDetailScreen({
+    super.key,
+    required this.transaction,
+    required this.onDelete,
+  });
+
+  final TransactionData transaction;
+  final VoidCallback onDelete;
+
+  Future<void> confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: Container(
+          width: 54,
+          height: 54,
+          decoration: const BoxDecoration(
+            color: Color(0xFFFFECEC),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.warning_amber_rounded,
+            color: AppColors.red,
+            size: 30,
+          ),
+        ),
+        title: const Text(
+          'Xóa giao dịch này?',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.w900),
+        ),
+        content: Text(
+          'Khoản chi ${money(transaction.amount)} tại ${transaction.name} sẽ bị xóa khỏi lịch sử và ngân sách liên quan.',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.muted,
+            fontSize: 12,
+            height: 1.4,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              style: FilledButton.styleFrom(backgroundColor: AppColors.red),
+              child: const Text(
+                'Xóa vĩnh viễn',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Giữ lại giao dịch'),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) onDelete();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final expense = transaction.amount < 0;
+    return PageScaffold(
+      title: 'Chi tiết giao dịch',
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: [
+                BubbleIcon(transaction.icon, transaction.color, size: 58),
+                const SizedBox(height: 12),
+                Text(
+                  '${expense ? '-' : '+'}${money(transaction.amount)}',
+                  style: TextStyle(
+                    color: expense ? AppColors.red : AppColors.green,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  transaction.name,
+                  style: const TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  transaction.date,
+                  style: const TextStyle(color: AppColors.muted, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(
+              children: [
+                DetailRow(
+                  icon: Icons.category_outlined,
+                  label: 'Danh mục',
+                  value: transaction.category,
+                ),
+                const Divider(height: 1, color: AppColors.line),
+                const DetailRow(
+                  icon: Icons.calendar_month_outlined,
+                  label: 'Thời gian',
+                  value: 'Hôm nay · 14:20',
+                ),
+                const Divider(height: 1, color: AppColors.line),
+                const DetailRow(
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: 'Phương thức',
+                  value: 'Ví MoMo cá nhân',
+                ),
+                const Divider(height: 1, color: AppColors.line),
+                const DetailRow(
+                  icon: Icons.person_outline,
+                  label: 'Người ghi chép',
+                  value: 'Minh Anh',
+                ),
+                const Divider(height: 1, color: AppColors.line),
+                DetailRow(
+                  icon: Icons.tag_rounded,
+                  label: 'Mã giao dịch',
+                  value:
+                      'MM-${transaction.name.hashCode.abs().toString().padLeft(8, '0').substring(0, 8)}',
+                ),
+              ],
+            ),
+          ),
+          const SectionTitle('Ghi chú & Chứng từ'),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Text(
+              'Giao dịch được ghi nhận trong MoneyMate. Bạn có thể chỉnh sửa thông tin hoặc xóa giao dịch bên dưới.',
+              style: TextStyle(
+                color: AppColors.muted,
+                fontSize: 12,
+                height: 1.4,
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          FilledButton.icon(
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Chức năng chỉnh sửa đã sẵn sàng')),
+            ),
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('Chỉnh sửa giao dịch'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFEEE9FF),
+              foregroundColor: AppColors.purple,
+              padding: const EdgeInsets.all(15),
+            ),
+          ),
+          const SizedBox(height: 9),
+          FilledButton.icon(
+            onPressed: () => confirmDelete(context),
+            icon: const Icon(Icons.delete_outline_rounded),
+            label: const Text('Xóa giao dịch'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFFFE5E5),
+              foregroundColor: AppColors.red,
+              padding: const EdgeInsets.all(15),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DetailRow extends StatelessWidget {
+  const DetailRow({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 13),
+    child: Row(
+      children: [
+        Icon(icon, color: AppColors.purple, size: 20),
+        const SizedBox(width: 11),
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.muted, fontSize: 11),
+        ),
+        const Spacer(),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: AppColors.ink,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class GoalsScreen extends StatelessWidget {
