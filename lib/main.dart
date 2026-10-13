@@ -282,17 +282,25 @@ class ScreenHeader extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: const [
-                BoxShadow(color: Color(0x1233256B), blurRadius: 14),
-              ],
+          InkWell(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const NotificationsScreen(),
+              ),
             ),
-            child: const Icon(Icons.notifications_none_rounded),
+            borderRadius: BorderRadius.circular(15),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x1233256B), blurRadius: 14),
+                ],
+              ),
+              child: const Icon(Icons.notifications_none_rounded),
+            ),
           ),
         ],
       ),
@@ -1336,6 +1344,214 @@ class GoalsScreen extends StatelessWidget {
   }
 }
 
+class NotificationsScreen extends StatefulWidget {
+  const NotificationsScreen({super.key});
+
+  @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  int filter = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    const notifications = [
+      (
+        Icons.warning_amber_rounded,
+        AppColors.orange,
+        'Cảnh báo phòng bị Giải trí',
+        'Phòng bị Giải trí & Bạn bè đã chạm 71% hạn mức. Hãy cân nhắc các khoản chi sắp tới.',
+        '10 phút trước',
+      ),
+      (
+        Icons.receipt_long_rounded,
+        AppColors.red,
+        'Ghi chi tiêu giống MoMo',
+        'Xác nhận giao dịch Highlands Coffee 45.000₫ được ghi nhận từ ví MoMo.',
+        '1 giờ trước',
+      ),
+      (
+        Icons.savings_rounded,
+        AppColors.green,
+        'Tuyệt vời! Mục tiêu đạt 84%',
+        'Quỹ dự phòng khẩn cấp chỉ còn một chút nữa là hoàn thành.',
+        'Hôm nay',
+      ),
+      (
+        Icons.school_rounded,
+        AppColors.purple,
+        'Góc FPTU: Tiết kiệm có chiến lược',
+        'Duy trì ngân sách học tập giúp bạn chủ động hơn cho học kỳ mới.',
+        'Hôm qua',
+      ),
+      (
+        Icons.auto_awesome_rounded,
+        Color(0xFF6A78D1),
+        'Phân tích tổng kết tuần',
+        'Bạn đã chi ít hơn tuần trước 12%. Tiếp tục giữ nhịp nhé!',
+        '2 ngày trước',
+      ),
+    ];
+    return PageScaffold(
+      title: 'Trung tâm thông báo',
+      action: TextButton(
+        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã đánh dấu tất cả là đã đọc')),
+        ),
+        child: const Text('Đọc hết'),
+      ),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+        children: [
+          Row(
+            children: ['Tất cả', 'Cảnh báo ngân sách', 'Của bạn']
+                .asMap()
+                .entries
+                .map(
+                  (entry) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: ChoiceChip(
+                        label: Text(
+                          entry.value,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 10),
+                        ),
+                        selected: filter == entry.key,
+                        selectedColor: AppColors.purple,
+                        labelStyle: TextStyle(
+                          color: filter == entry.key
+                              ? Colors.white
+                              : AppColors.muted,
+                        ),
+                        onSelected: (_) => setState(() => filter = entry.key),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          const SectionTitle('Hôm nay'),
+          ...notifications.map(
+            (item) => Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(17),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BubbleIcon(item.$1, item.$2, size: 42),
+                  const SizedBox(width: 11),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.$3,
+                                style: const TextStyle(
+                                  color: AppColors.ink,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: const BoxDecoration(
+                                color: AppColors.purple,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          item.$4,
+                          style: const TextStyle(
+                            color: AppColors.muted,
+                            fontSize: 11,
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          item.$5,
+                          style: const TextStyle(
+                            color: AppColors.purple,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SectionTitle('Tùy chỉnh thông báo'),
+          const SettingsSwitch(
+            title: 'Cảnh báo hạn mức an toàn',
+            subtitle: 'Thông báo khi ngân sách sắp hết',
+          ),
+          const SettingsSwitch(
+            title: 'Nhắc ghi chép',
+            subtitle: 'Nhắc cập nhật chi tiêu cuối ngày',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsSwitch extends StatefulWidget {
+  const SettingsSwitch({
+    super.key,
+    required this.title,
+    required this.subtitle,
+  });
+  final String title;
+  final String subtitle;
+
+  @override
+  State<SettingsSwitch> createState() => _SettingsSwitchState();
+}
+
+class _SettingsSwitchState extends State<SettingsSwitch> {
+  bool value = true;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: SwitchListTile(
+      value: value,
+      activeThumbColor: AppColors.purple,
+      onChanged: (next) => setState(() => value = next),
+      title: Text(
+        widget.title,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
+      subtitle: Text(
+        widget.subtitle,
+        style: const TextStyle(color: AppColors.muted, fontSize: 10),
+      ),
+    ),
+  );
+}
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -1403,6 +1619,82 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
         ),
+        const SectionTitle('Tài khoản & Ví thanh toán', action: '+ Thêm ví'),
+        Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.purple, AppColors.darkPurple],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'TỔNG SỐ DƯ KHẢ DỤNG',
+                style: TextStyle(color: Color(0xFFD8CEFF), fontSize: 10),
+              ),
+              SizedBox(height: 6),
+              Text(
+                '5.790.000₫',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 27,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        const WalletTile(
+          icon: Icons.account_balance_wallet_rounded,
+          color: Color(0xFFB252D7),
+          title: 'Ví MoMo cá nhân',
+          value: '2.340.000₫',
+        ),
+        const WalletTile(
+          icon: Icons.account_balance_rounded,
+          color: AppColors.purple,
+          title: 'TPBank · FPT',
+          value: '3.450.000₫',
+        ),
+        const WalletTile(
+          icon: Icons.payments_rounded,
+          color: AppColors.green,
+          title: 'Tiền mặt trong ví',
+          value: '250.000₫',
+        ),
+        const SectionTitle('Tiện ích sinh viên FPTU'),
+        Row(
+          children: [
+            Expanded(
+              child: QuickAction(
+                icon: Icons.restaurant_menu_rounded,
+                label: 'Xem lịch ăn',
+                onTap: () {},
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: QuickAction(
+                icon: Icons.picture_as_pdf_outlined,
+                label: 'Xuất báo cáo PDF',
+                onTap: () {},
+              ),
+            ),
+          ],
+        ),
+        const SectionTitle('Bảo mật & Ứng dụng'),
+        const SettingsSwitch(
+          title: 'Bảo mật sinh trắc học',
+          subtitle: 'Dùng vân tay hoặc khuôn mặt',
+        ),
+        const SettingsSwitch(
+          title: 'Chế độ Thư viện Học tập',
+          subtitle: 'Tự động giảm âm thanh thông báo',
+        ),
         const SectionTitle('Cài đặt'),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -1446,6 +1738,40 @@ class ProfileScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+class WalletTile extends StatelessWidget {
+  const WalletTile({
+    super.key,
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.value,
+  });
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 8),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: ListTile(
+      leading: BubbleIcon(icon, color, size: 40),
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+      ),
+      trailing: Text(
+        value,
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+      ),
+    ),
+  );
 }
 
 class AddTransactionSheet extends StatefulWidget {
