@@ -71,31 +71,38 @@ class BudgetData {
 const budgetData = [
   BudgetData(
     'Ăn uống & Cà phê',
-    850000,
-    1200000,
+    2100000,
+    3500000,
     Icons.restaurant_rounded,
     Color(0xFF6C4CE3),
   ),
   BudgetData(
-    'Học tập & Đi lại',
-    720000,
-    1000000,
-    Icons.directions_bus_rounded,
+    'Học tập & Giáo trình',
+    650000,
+    1200000,
+    Icons.menu_book_rounded,
     AppColors.orange,
   ),
   BudgetData(
     'Giải trí & Bạn bè',
-    560000,
-    900000,
+    1420000,
+    2000000,
     Icons.sports_esports_rounded,
     Color(0xFFEE5B8E),
   ),
   BudgetData(
     'Đi lại & Xe cộ',
-    400000,
-    600000,
+    380000,
+    800000,
     Icons.two_wheeler_rounded,
     Color(0xFF2BA8A0),
+  ),
+  BudgetData(
+    'Mua sắm cá nhân',
+    0,
+    500000,
+    Icons.shopping_bag_rounded,
+    Color(0xFF5368E8),
   ),
 ];
 
@@ -120,7 +127,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
     const TransactionData(
       'Lương tháng 10',
       'Thu nhập',
-      12000000,
+      8000000,
       Icons.account_balance_wallet_rounded,
       AppColors.green,
       'Hôm nay, 07:30',
@@ -139,7 +146,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
       -180000,
       Icons.tv_rounded,
       Color(0xFFEE5B8E),
-      '12/10/2026',
+      '12/10/2024',
     ),
     const TransactionData(
       'Siêu thị WinMart',
@@ -147,7 +154,7 @@ class _MoneyMateShellState extends State<MoneyMateShell> {
       -356000,
       Icons.shopping_cart_rounded,
       Color(0xFF2BA8A0),
-      '11/10/2026',
+      '11/10/2024',
     ),
   ];
 
@@ -255,52 +262,114 @@ class ScreenHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              if (label != null)
-                Text(
-                  label!,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1,
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: AppColors.purple,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: Colors.white,
+                  size: 17,
+                ),
+              ),
+              const SizedBox(width: 7),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'MoneyMate',
+                      style: TextStyle(
+                        color: AppColors.purple,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      'Transaction History',
+                      style: TextStyle(color: AppColors.muted, fontSize: 8),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const NotificationsScreen(),
                   ),
                 ),
-              if (label != null) const SizedBox(height: 4),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.ink,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
+                child: const Badge(
+                  label: Text('3'),
+                  child: Icon(Icons.notifications_none_rounded, size: 22),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const CircleAvatar(
+                radius: 15,
+                backgroundColor: Color(0xFFD9C4A4),
+                child: Text(
+                  'MA',
+                  style: TextStyle(
+                    color: AppColors.ink,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ),
             ],
           ),
-          InkWell(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const NotificationsScreen(),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (label != null)
+                      Text(
+                        label!,
+                        style: const TextStyle(
+                          color: AppColors.muted,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: .7,
+                        ),
+                      ),
+                    if (label != null) const SizedBox(height: 4),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColors.ink,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            borderRadius: BorderRadius.circular(15),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x1233256B), blurRadius: 14),
-                ],
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEEEAFE),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: AppColors.purple,
+                  size: 19,
+                ),
               ),
-              child: const Icon(Icons.notifications_none_rounded),
-            ),
+            ],
           ),
         ],
       ),
@@ -347,8 +416,8 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 125),
       children: [
         const ScreenHeader(
-          'Ngân sách tháng 10/2026',
-          label: 'XIN CHÀO, DUY 👋',
+          'Ngân sách tháng 10/2024',
+          label: 'QUẢN LÝ PHÒNG BỊ CHI TIÊU',
         ),
         Container(
           padding: const EdgeInsets.all(20),
@@ -391,7 +460,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                '18.000.000₫',
+                '8.000.000₫',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 30,
@@ -399,14 +468,14 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const Text(
-                'Đã chi 6.550.000₫ · Còn lại 11.450.000₫',
+                'Đã chi 4.550.000₫ · Còn lại 3.450.000₫',
                 style: TextStyle(color: Color(0xFFDCD4FF), fontSize: 12),
               ),
               const SizedBox(height: 18),
               ClipRRect(
                 borderRadius: BorderRadius.circular(5),
                 child: const LinearProgressIndicator(
-                  value: .36,
+                  value: .57,
                   minHeight: 7,
                   color: Color(0xFF75E1B8),
                   backgroundColor: Colors.white24,
@@ -416,9 +485,9 @@ class HomeScreen extends StatelessWidget {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  HeroStat('ĐÃ CHI', '36%'),
-                  HeroStat('CÒN LẠI', '64%'),
-                  HeroStat('MỖI NGÀY', '636K'),
+                  HeroStat('ĐÃ CHI', '4.550.000₫'),
+                  HeroStat('CÒN LẠI', '3.450.000₫'),
+                  HeroStat('MỖI NGÀY', '265K'),
                 ],
               ),
             ],
@@ -1059,13 +1128,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Column(
         children: [
-          const ScreenHeader('Giao dịch', label: 'THÁNG 10/2026'),
+          const ScreenHeader('Giao dịch', label: 'THÁNG 10/2024'),
           const Row(
             children: [
               Expanded(
                 child: SummaryCard(
                   'Thu nhập',
-                  '+12.000.000₫',
+                  '+8.000.000₫',
                   AppColors.green,
                   Color(0xFFE9F9F2),
                 ),
@@ -1074,7 +1143,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               Expanded(
                 child: SummaryCard(
                   'Chi tiêu',
-                  '-6.550.000₫',
+                  '-4.550.000₫',
                   AppColors.red,
                   Color(0xFFFFF0F2),
                 ),
@@ -1190,25 +1259,25 @@ class GoalsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     const goals = [
       (
-        'Du lịch Đà Lạt',
-        4200000,
-        8000000,
-        Icons.flight_takeoff_rounded,
+        'Laptop đồ họa & PRM323',
+        13500000,
+        20000000,
+        Icons.laptop_mac_rounded,
         AppColors.purple,
       ),
       (
-        'MacBook mới',
-        12000000,
-        30000000,
-        Icons.laptop_mac_rounded,
-        AppColors.orange,
-      ),
-      (
-        'Quỹ khẩn cấp',
-        18500000,
-        20000000,
+        'Quỹ dự phòng khẩn cấp',
+        4200000,
+        5000000,
         Icons.verified_user_rounded,
         AppColors.green,
+      ),
+      (
+        'Lệ phí thi AWS Cloud & IELTS',
+        900000,
+        3000000,
+        Icons.school_rounded,
+        AppColors.orange,
       ),
     ];
     return ListView(
@@ -1237,7 +1306,7 @@ class GoalsScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '34.700.000₫',
+                    '18.600.000₫',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 26,
@@ -1596,7 +1665,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 11),
               const Text(
-                'Ngọc Duy',
+                'Nguyễn Minh Anh',
                 style: TextStyle(
                   color: AppColors.ink,
                   fontSize: 19,
@@ -1604,7 +1673,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               const Text(
-                'duy.ngoc@moneymate.vn',
+                'Kỳ thi: PRM · SE170492',
                 style: TextStyle(color: AppColors.muted, fontSize: 12),
               ),
               const SizedBox(height: 12),
